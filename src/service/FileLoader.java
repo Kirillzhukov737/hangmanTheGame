@@ -7,11 +7,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FileLoaderService {
+public class FileLoader {
 
-    private final String filePath = "./resources/words.txt";
+    private final String filePath;
+    private List<String> words = new ArrayList<>();
 
-    List<String> words = new ArrayList<>();
+    public FileLoader(String filePath) {
+        this.filePath = filePath;
+    }
 
     public void readWordsFromFile() throws IOException {
 
@@ -27,14 +30,14 @@ public class FileLoaderService {
                 }
             }
         } catch (FileNotFoundException e) {
-            throw new IOException("Не можем прочитать файл " + filePath, e);
+            throw new IOException("The file cannot be find " + filePath, e);
         } catch (IOException e) {
-            throw new IOException("Произошла ошибка во время чтения файла " + filePath, e);
+            throw new IOException("An error occurred while reading the file " + filePath, e);
         }
         this.words = wordsList;
     }
 
     public List<String> getWordsList() {
-        return words;
+        return new ArrayList<>(words);
     }
 }

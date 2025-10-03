@@ -1,70 +1,71 @@
-import model.Player;
-import service.DictionaryService;
-import service.FileLoaderService;
-import service.FileWriterService;
-import service.GameService;
+import service.Player;
+import service.Dictionary;
+import service.FileLoader;
+import service.FileWriter;
+import service.Game;
+import service.Dialog;
 
 import java.io.IOException;
-import java.util.Scanner;
 
 import static java.lang.System.*;
 
 public class Menu {
 
-    private final Scanner scanner = new Scanner(in);
+    private static final int START_GAME = 1;
+    private static final int ADD_WORD = 2;
+    private static final int READ_WORDS = 3;
+    private static final int QUIT_GAME = 4;
+
+    public static final String FILE_PATH = "./resources/words.txt";
 
     private void showMenu() {
-
-        out.println("Выберите действие: \n" +
-                "1 -> Игра против бота \n" +
-                "2 -> Добавить слово в словарь \n" +
-                "3 -> Посмотреть список слов \n" +
-                "4 -> Выход из игры");
+        out.println("Выберите дейсвтие: ");
+        out.println(START_GAME + "-> Игра ");
+        out.println(ADD_WORD + "-> Добавить слово в словарь ");
+        out.println(READ_WORDS + "-> Посмотреть список слов ");
+        out.println(QUIT_GAME + "-> Выход из игры ");
     }
 
-    public void menuSelector() {
+    public void select() {
 
-        FileLoaderService fileLoaderService = new FileLoaderService();
-        FileWriterService fileWriterService = new FileWriterService();
+        FileLoader fileLoader = new FileLoader(FILE_PATH);
+        FileWriter fileWriter = new FileWriter(FILE_PATH);
 
         try {
-            fileLoaderService.readWordsFromFile();
+            fileLoader.readWordsFromFile();
         } catch (IOException e) {
-            out.println("Ошибка при чтении файла");
+            out.println("Error reading file" + e);
+            out.println("Завершение работы ");
+            System.exit(1);
         }
 
-        DictionaryService dictionaryService = new DictionaryService(fileLoaderService.getWordsList(), fileWriterService);
-        GameService gameService = new GameService(dictionaryService, fileLoaderService, scanner);
+        Dictionary dictionary = new Dictionary(fileLoader.getWordsList(), fileWriter);
+        Game game = new Game(dictionary, fileLoader);
 
         while (true) {
 
             showMenu();
-            out.println("Сделайте выбор:  ");
 
-            String input = scanner.nextLine().trim();
-            int choise;
-            try {
-                choise = Integer.parseInt(input);
-            } catch (NumberFormatException e) {
-                continue;
-            }
+            int choise = Dialog.inputInt("Сделайте выбор: ",
+                    "Неверный ввод. Введите число от 1 до 4.",
+                    1,
+                    4);
 
             switch (choise) {
-                case 1:
-                    out.println("Игра против бота, выберите героя: ");
+                case START_GAME:
+                    out.println("Игра, выберите героя: ");
                     Player selectedPlayer = Player.choisePlayer();
-                    out.println("Герой выбран " + selectedPlayer);
-                    gameService.startGame();
+                    game.startGame();
                     break;
-                case 2:
+                case ADD_WORD:
                     out.println("Добавить слово");
-                    dictionaryService.addWord();
+                    dictionary.addWord();
                     break;
-                case 3:
+                case READ_WORDS:
                     out.println("Посмотреть список слов");
-                    out.println(fileLoaderService.getWordsList());
+                    out.println(fileLoader.getWordsList());
                     break;
-                case 4:
+                case QUIT_GAME:
                     out.println("Выход из игры");
                     System.exit(0);
             }
