@@ -50,4 +50,5 @@ public class Player {
         out.println("Вы выбрали героя - ваш герой " + heroNumber);
         return new Player(selectedHero);
     }
+
 }
